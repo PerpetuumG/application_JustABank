@@ -68,7 +68,7 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 const displayTransactions = function(transactions) {
 
-  containerTransactions.innerHTML = ''
+  containerTransactions.innerHTML = '';
   transactions.forEach(function(trans, index) {
 
     const transType = trans > 0
@@ -84,7 +84,20 @@ const displayTransactions = function(transactions) {
         </div>
     `;
 
-    containerTransactions.insertAdjacentHTML('afterbegin', transactionRow)
+    containerTransactions.insertAdjacentHTML('afterbegin', transactionRow);
   });
 };
 displayTransactions(account1.transactions);
+
+const createNicknames = function(accs) {
+  accs.forEach((acc) => {
+    acc.nickname = acc.userName.toLowerCase().split(' ').map((word) => word[0]).join('');
+  });
+};
+createNicknames(accounts)
+console.log(accounts);
+
+/*
+const userName = 'Oliver Avila';   //nickname = 'oa'
+const nickname = userName.toLowerCase().split(' ').map((word) => word[0]).join();
+*/
