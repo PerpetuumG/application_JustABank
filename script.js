@@ -66,6 +66,7 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
+// Transaction
 const displayTransactions = function(transactions) {
 
   containerTransactions.innerHTML = '';
@@ -87,17 +88,76 @@ const displayTransactions = function(transactions) {
     containerTransactions.insertAdjacentHTML('afterbegin', transactionRow);
   });
 };
-displayTransactions(account1.transactions);
 
+// Nickname
 const createNicknames = function(accs) {
   accs.forEach((acc) => {
     acc.nickname = acc.userName.toLowerCase().split(' ').map((word) => word[0]).join('');
   });
 };
-createNicknames(accounts)
-console.log(accounts);
+createNicknames(accounts);
+// console.log(accounts);
 
 /*
 const userName = 'Oliver Avila';   //nickname = 'oa'
 const nickname = userName.toLowerCase().split(' ').map((word) => word[0]).join();
 */
+
+// Balance
+const displayBalance = function(transactions) {
+  const balance = transactions.reduce((acc, trans) => {
+    return (acc + trans);
+  }, 0);
+  labelBalance.textContent = `${balance}$`;
+};
+
+// Total
+const displayTotal = function(account) {
+  const depositesTotal = account.transactions
+    .filter(trans => trans > 0)
+    .reduce((acc, trans) => acc + trans, 0);
+  labelSumIn.textContent = `${depositesTotal}$`;
+
+  const withdrawalsTotal = account.transactions
+    .filter(trans => trans < 0)
+    .reduce((acc, trans) => acc + trans, 0);
+  labelSumOut.textContent = `${withdrawalsTotal}$`;
+
+  const interestTotal = account.transactions
+    .filter(trans => trans > 0)
+    .map(depos => (depos * account.interest) / 100)
+    .filter((interest, index, arr) => {
+      // console.log(arr);
+      return interest >= 5;
+    })
+    .reduce((acc, interest) => acc + interest, 0);
+  labelSumInterest.textContent = `${interestTotal}$`;
+};
+
+// Login
+let currentAccount;
+btnLogin.addEventListener('click', function(e) {
+  e.preventDefault();
+  currentAccount = accounts.find(account => account.nickname === inputLoginUsername.value);
+  console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and welcome message
+    containerApp.style.opacity = '100';
+    labelWelcome.textContent = `Рады, что вы снова с нами, ${currentAccount.userName.split(' ')[0]}!`;
+
+    // Clear inputs
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    // Display transactions
+    displayTransactions(currentAccount.transactions);
+
+    // Display balance
+    displayBalance(currentAccount.transactions);
+
+    // Display total
+    displayTotal(currentAccount);
+  }
+});
