@@ -4,7 +4,7 @@
 
 const account1 = {
   userName: 'Cecil Ireland',
-  transactions: [500, 250, -300, 5000, -850, -110, -170, 1100],
+  transactions: [500.32, 250, -300.92, 5000, -850, -110.18, -170, 1100],
   interest: 1.5,
   pin: 1111
 };
@@ -85,7 +85,7 @@ const displayTransactions = function(transactions, sort = false) {
           <div class='transactions__type transactions__type--${transType}'>
             ${index + 1} ${transType}
           </div>
-          <div class='transactions__value'>${trans}$</div>
+          <div class='transactions__value'>${trans.toFixed(2)}$</div>
         </div>
     `;
 
@@ -113,7 +113,7 @@ const displayBalance = function(account) {
     return (acc + trans);
   }, 0);
   account.balance = balance;
-  labelBalance.textContent = `${balance}$`;
+  labelBalance.textContent = `${balance.toFixed(2)}$`;
 };
 
 // Total
@@ -121,12 +121,12 @@ const displayTotal = function(account) {
   const depositesTotal = account.transactions
     .filter(trans => trans > 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumIn.textContent = `${depositesTotal}$`;
+  labelSumIn.textContent = `${depositesTotal.toFixed(2)}$`;
 
   const withdrawalsTotal = account.transactions
     .filter(trans => trans < 0)
     .reduce((acc, trans) => acc + trans, 0);
-  labelSumOut.textContent = `${withdrawalsTotal}$`;
+  labelSumOut.textContent = `${withdrawalsTotal.toFixed(2)}$`;
 
   const interestTotal = account.transactions
     .filter(trans => trans > 0)
@@ -136,7 +136,7 @@ const displayTotal = function(account) {
       return interest >= 5;
     })
     .reduce((acc, interest) => acc + interest, 0);
-  labelSumInterest.textContent = `${interestTotal}$`;
+  labelSumInterest.textContent = `${interestTotal.toFixed(2)}$`;
 };
 
 // Update UI
@@ -160,7 +160,7 @@ btnLogin.addEventListener('click', function(e) {
   currentAccount = accounts.find(account => account.nickname === inputLoginUsername.value);
   console.log(currentAccount);
 
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +(inputLoginPin.value)) {
     // Display UI and welcome message
     containerApp.style.opacity = '100';
     labelWelcome.textContent = `Рады, что вы снова с нами, ${currentAccount.userName.split(' ')[0]}!`;
@@ -177,7 +177,7 @@ btnLogin.addEventListener('click', function(e) {
 // Transfer
 btnTransfer.addEventListener('click', function(e) {
   e.preventDefault();
-  const transferAmount = Number(inputTransferAmount.value);
+  const transferAmount = +(inputTransferAmount.value);
   const recipientNickname = inputTransferTo.value;
   const recipientAccount = accounts.find(account => account.nickname === recipientNickname);
   inputTransferAmount.value = '';
@@ -194,7 +194,7 @@ btnTransfer.addEventListener('click', function(e) {
 btnClose.addEventListener('click', function(e) {
   e.preventDefault();
 
-  if (inputCloseNickname.value === currentAccount.nickname && Number(inputClosePin.value) === currentAccount.pin) {
+  if (inputCloseNickname.value === currentAccount.nickname && +(inputClosePin.value) === currentAccount.pin) {
     const currentAccountIndex = accounts.findIndex(account => account.nickname === currentAccount.nickname);
     accounts.splice(currentAccountIndex, 1);
     containerApp.style.opacity = '0';
@@ -206,7 +206,7 @@ btnClose.addEventListener('click', function(e) {
 
 btnLoan.addEventListener('click', function(e) {
   e.preventDefault();
-  const loanAmount = Number(inputLoanAmount.value);
+  const loanAmount = Math.floor(inputLoanAmount.value);
 
   if (loanAmount > 0 && currentAccount.transactions.some(trans => trans >= loanAmount * 10 / 100)) {
     currentAccount.transactions.push(loanAmount);
@@ -220,5 +220,18 @@ let transactionsSorted = false;
 btnSort.addEventListener('click', function(e) {
   e.preventDefault();
   displayTransactions(currentAccount.transactions, !transactionsSorted);
-  transactionsSorted = !transactionsSorted
+  transactionsSorted = !transactionsSorted;
 });
+
+// Array.from() example
+/*
+const logoImage = document.querySelector('.logo');
+logoImage.addEventListener('click', function() {
+  const transactionsUi = document.querySelectorAll('.transactions__value');
+  console.log(transactionsUi);
+  // const transactionsUiArray = Array.from(transactionsUi);
+  // console.log(transactionsUiArray.map(elem => +(elem.textContent)));
+  const transactionsUiArray = Array.from(transactionsUi, (elem) => +(elem.textContent));
+  console.log(transactionsUiArray);
+});
+*/
